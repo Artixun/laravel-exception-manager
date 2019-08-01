@@ -1,0 +1,54 @@
+{
+    "name": "artixun/laravel-exception-manager",
+    "description": "catch Laravel Error and Exception and manage it.",
+    "keywords": [
+        "artixun",
+        "laravel-exception-manager"
+    ],
+    "homepage": "https://github.com/artixun/laravel-exception-manager",
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Jinal Somaiya",
+            "email": "jinal@artixun.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^7.1",
+        "illuminate/support": "5.8.*"
+    },
+    "require-dev": {
+        "orchestra/testbench": "3.8.*",
+        "phpunit/phpunit": "^7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Artixun\\LaravelExceptionManager\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Artixun\\LaravelExceptionManager\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Artixun\\LaravelExceptionManager\\LaravelExceptionManagerServiceProvider"
+            ],
+            "aliases": {
+                "LaravelExceptionManager": "Artixun\\LaravelExceptionManager\\LaravelExceptionManagerFacade"
+            }
+        }
+    }
+}
