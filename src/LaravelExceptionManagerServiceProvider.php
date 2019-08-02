@@ -11,37 +11,21 @@ class LaravelExceptionManagerServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        /*
-         * Optional methods to load your package assets
-         */
-        // $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'laravel-exception-manager');
-        // $this->loadViewsFrom(__DIR__.'/../resources/views', 'laravel-exception-manager');
-        // $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
-        // $this->loadRoutesFrom(__DIR__.'/routes.php');
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
 
         if ($this->app->runningInConsole()) {
             $this->publishes([
                 __DIR__.'/../config/config.php' => config_path('laravel-exception-manager.php'),
-            ], 'config');
+            ], 'laravel-exception-manager-config');
 
-            // Publishing the views.
-            /*$this->publishes([
-                __DIR__.'/../resources/views' => resource_path('views/vendor/laravel-exception-manager'),
-            ], 'views');*/
-
-            // Publishing assets.
-            /*$this->publishes([
-                __DIR__.'/../resources/assets' => public_path('vendor/laravel-exception-manager'),
-            ], 'assets');*/
-
-            // Publishing the translation files.
-            /*$this->publishes([
-                __DIR__.'/../resources/lang' => resource_path('lang/vendor/laravel-exception-manager'),
-            ], 'lang');*/
-
-            // Registering package commands.
-            // $this->commands([]);
+            if (!class_exists('CreateErrorLogsTable')) {
+                $this->publishes([
+                    __DIR__.'/../database/migrations/create_error_logs_table.php.stub' =>
+                        database_path('migrations/'.date('Y_m_d_His', time()).'_create_error_logs_table.php')
+                ], 'laravel-exception-manager-migration');
+            }
         }
+
     }
 
     /**
@@ -57,4 +41,14 @@ class LaravelExceptionManagerServiceProvider extends ServiceProvider
             return new LaravelExceptionManager;
         });
     }
+
+//    protected function pushDatabaseHandlerToLogger()
+//    {
+//        $logWriter = $this->app->make(LoggerInterface::class);
+//        $logger = $logWriter->getMonolog();
+//
+//        $slackHandler = new SlackWebhookHandler($webhookUrl, null, null, true, null, false, true, $this->getlogLevel($logger));
+//        $slackHandler = $this->pushProcessors($slackHandler);
+//        $logger->pushHandler($slackHandler);
+//    }
 }
