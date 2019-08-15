@@ -4,3 +4,5 @@ docs
 vendor
 coverage
 .idea
+node_modules
+package-lock.json

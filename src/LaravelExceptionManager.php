@@ -19,10 +19,4 @@ class LaravelExceptionManager
             'content' => json_encode($content)
         ]);
     }
-
-    public function __invoke(array $config)
-    {
-        dd('c');
-        dd($config);
-    }
 }

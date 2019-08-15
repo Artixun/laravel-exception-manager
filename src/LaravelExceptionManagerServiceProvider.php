@@ -2,6 +2,7 @@
 
 namespace Artixun\LaravelExceptionManager;
 
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
 class LaravelExceptionManagerServiceProvider extends ServiceProvider
@@ -13,9 +14,17 @@ class LaravelExceptionManagerServiceProvider extends ServiceProvider
     {
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
 
+        $this->loadViewsFrom(
+            __DIR__.'/../resources/views', 'laravel-exception-manager'
+        );
+
+        Route::group($this->routeConfiguration(), function () {
+            $this->loadRoutesFrom(__DIR__.'/Http/routes.php');
+        });
+
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__.'/../config/config.php' => config_path('laravel-exception-manager.php'),
+                __DIR__.'/../config/laravel-exception-manager.php' => config_path('laravel-exception-manager.php'),
             ], 'laravel-exception-manager-config');
 
             if (!class_exists('CreateErrorLogsTable')) {
@@ -34,21 +43,24 @@ class LaravelExceptionManagerServiceProvider extends ServiceProvider
     public function register()
     {
         // Automatically apply the package configuration
-        $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'laravel-exception-manager');
+        $this->mergeConfigFrom(__DIR__.'/../config/laravel-exception-manager.php', 'laravel-exception-manager');
 
         // Register the main class to use with the facade
-        $this->app->singleton('laravel-exception-manager', function () {
+        $this->app->bind('laravel-exception-manager', function () {
             return new LaravelExceptionManager;
         });
     }
 
-//    protected function pushDatabaseHandlerToLogger()
-//    {
-//        $logWriter = $this->app->make(LoggerInterface::class);
-//        $logger = $logWriter->getMonolog();
-//
-//        $slackHandler = new SlackWebhookHandler($webhookUrl, null, null, true, null, false, true, $this->getlogLevel($logger));
-//        $slackHandler = $this->pushProcessors($slackHandler);
-//        $logger->pushHandler($slackHandler);
-//    }
+    /**
+     * Get the Laravel Exception Manager route group configuration array.
+     *
+     * @return array
+     */
+    private function routeConfiguration()
+    {
+        return [
+            'namespace' => 'LaravelExceptionManager\Http\Controllers',
+            'prefix' => config('laravel-exception-manager.path')
+        ];
+    }
 }
