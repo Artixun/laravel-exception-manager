@@ -13,6 +13,8 @@ if (token) {
 
 Vue.use(VueRouter);
 
+window.Popper = require('popper.js').default;
+
 const router = new VueRouter({
     routes: Routes,
     mode: 'history',

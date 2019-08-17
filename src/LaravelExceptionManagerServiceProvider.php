@@ -33,6 +33,10 @@ class LaravelExceptionManagerServiceProvider extends ServiceProvider
                         database_path('migrations/'.date('Y_m_d_His', time()).'_create_error_logs_table.php')
                 ], 'laravel-exception-manager-migration');
             }
+
+            $this->publishes([
+                __DIR__.'/../public' => public_path('vendor/laravel-exception-manager'),
+            ], 'laravel-exception-manager-assets');
         }
 
     }
@@ -59,7 +63,7 @@ class LaravelExceptionManagerServiceProvider extends ServiceProvider
     private function routeConfiguration()
     {
         return [
-            'namespace' => 'LaravelExceptionManager\Http\Controllers',
+            'namespace' => 'Artixun\LaravelExceptionManager\Http\Controllers',
             'prefix' => config('laravel-exception-manager.path')
         ];
     }
