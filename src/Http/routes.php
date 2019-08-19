@@ -7,3 +7,5 @@
  */
 
 Route::get('/{view?}', 'HomeController@index')->where('view', '(.*)')->name('exception-manager');
+
+Route::post('exceptions', 'ExceptionController@index');
