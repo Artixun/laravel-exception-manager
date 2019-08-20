@@ -23,6 +23,9 @@ class ExceptionController extends Controller
     public function index(Request $request)
     {
         $entries = ErrorLog::on(config('laravel-exception-manager.database_connection'))
+            ->when($request->before, function ($query) use ($request) {
+                return $query->where('id', '<', $request->before);
+            })
             ->take($request->take ?? 50)
             ->orderByDesc('id')
             ->get();

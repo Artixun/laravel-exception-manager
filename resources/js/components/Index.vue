@@ -4,7 +4,6 @@
             <h5>Exception Logs</h5>
         </div>
 
-
         <div v-if="!ready" class="d-flex align-items-center justify-content-center card-bg-secondary p-5 bottom-radius">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" class="icon spin mr-2 fill-text-color">
                 <path d="M12 10a2 2 0 0 1-3.41 1.41A2 2 0 0 1 10 8V0a9.97 9.97 0 0 1 10 10h-8zm7.9 1.41A10 10 0 1 1 8.59.1v2.03a8 8 0 1 0 9.29 9.29h2.02zm-4.07 0a6 6 0 1 1-7.25-7.25v2.1a3.99 3.99 0 0 0-1.4 6.57 4 4 0 0 0 6.56-1.42h2.1z"></path>
@@ -27,7 +26,6 @@
             <thead>
                 <tr slot="table-header">
                     <th scope="col">Type</th>
-                    <th scope="col">Occurrences</th>
                     <th scope="col">Happened</th>
                     <th scope="col"></th>
                 </tr>
@@ -45,28 +43,11 @@
 
 
                 <tr v-for="entry in entries" :key="entry.id">
+
                     <td :title="entry.content.class" v-if="!$route.query.family_hash">
                         {{truncate(entry.content.class, 70)}}<br>
 
                         <small class="text-muted">{{truncate(entry.content.message, 100)}}</small>
-                    </td>
-
-                    <td class="table-fit" v-if="!$route.query.family_hash && !$route.query.tag">
-                        <span>{{entry.content.occurrences}}</span>
-                    </td>
-
-                    <td :title="entry.content.message" v-if="$route.query.family_hash">
-                        {{truncate(entry.content.message, 80)}}<br>
-
-                        <small class="text-muted">
-                    <span v-if="entry.content.user && entry.content.user.email">
-                        User: {{ entry.content.user.email }} ({{ entry.content.user.id }})
-                    </span>
-
-                            <span v-else>
-                        User: N/A
-                    </span>
-                        </small>
                     </td>
 
                     <td class="table-fit" :data-timeago="entry.created_at">{{timeAgo(entry.created_at)}}</td>
@@ -95,7 +76,6 @@
 </template>
 
 <script>
-    import $ from 'jquery';
     import _ from 'lodash';
     import axios from 'axios';
 
@@ -134,69 +114,57 @@
             document.title = "Exception Logs";
 
             this.loadEntries((entries) => {
-                console.log('mounted');
                 this.entries = entries;
-
                 this.checkForNewEntries();
-
                 this.ready = true;
             });
-
-            this.updateTimeAgo();
         },
-
 
         /**
          * Clean after the component is destroyed.
          */
         destroyed() {
             clearTimeout(this.newEntriesTimeout);
-            clearTimeout(this.updateEntriesTimeout);
-            clearTimeout(this.updateTimeAgoTimeout);
-
-            document.onkeyup = null;
         },
-
-
-        watch: {
-            '$route.query': function () {
-
-                console.log('watch');
-                clearTimeout(this.newEntriesTimeout);
-
-                this.hasNewEntries = false;
-                this.lastEntryIndex = '';
-
-                this.ready = false;
-
-                this.loadEntries((entries) => {
-                    this.entries = entries;
-
-                    this.checkForNewEntries();
-
-                    this.ready = true;
-                });
-            },
-        },
-
 
         methods: {
-            loadEntries(){
-                axios.post('/' + LaravelExceptionManager.path + '/exceptions'
+            loadEntries(after){
+                axios.post('/' + LaravelExceptionManager.path + '/exceptions' +
+                    '?before=' + this.lastEntryIndex +
+                    '&take=' + this.entriesPerRequest
                 ).then(response => {
+
                     this.lastEntryIndex = response.data.entries.length ? _.last(response.data.entries).id : this.lastEntryIndex;
-                    console.log(this.lastEntryIndex);
+
                     this.hasMoreEntries = response.data.entries.length >= this.entriesPerRequest;
+
+                    if (_.isFunction(after)) {
+                        after(response.data.entries);
+                    }
                 })
             },
 
+            /**
+             * Load more entries.
+             */
+            loadOlderEntries(){
+
+                this.loadingMoreEntries = true;
+
+                this.loadEntries((entries) => {
+                    this.entries.push(...entries);
+
+                    this.loadingMoreEntries = false;
+                });
+            },
 
             /**
              * Keep checking if there are new entries.
              */
             checkForNewEntries(){
                 this.newEntriesTimeout = setTimeout(() => {
-                    axios.post('/exceptions'
+                    axios.post('/' + LaravelExceptionManager.path + '/exceptions' +
+                        '?take=1'
                     ).then(response => {
                         if (response.data.entries.length && !this.entries.length) {
                             this.loadNewEntries();
@@ -212,35 +180,6 @@
                     })
                 }, this.newEntriesTimer);
             },
-
-
-            /**
-             * Update the timeago of each entry.
-             */
-            updateTimeAgo(){
-                this.updateTimeAgoTimeout = setTimeout(() => {
-                    _.each($('[data-timeago]'), time => {
-                        $(time).html(this.timeAgo($(time).data('timeago')));
-                    });
-
-                    this.updateTimeAgo();
-                }, 60000)
-            },
-
-
-            /**
-             * Load more entries.
-             */
-            loadOlderEntries(){
-                this.loadingMoreEntries = true;
-
-                this.loadEntries((entries) => {
-                    this.entries.push(...entries);
-
-                    this.loadingMoreEntries = false;
-                });
-            },
-
 
             /**
              * Load new entries.
@@ -260,7 +199,7 @@
 
                     this.checkForNewEntries();
                 });
-            }
+            },
         }
     }
 </script>

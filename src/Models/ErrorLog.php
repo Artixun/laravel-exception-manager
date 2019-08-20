@@ -13,4 +13,13 @@ use Illuminate\Database\Eloquent\Model;
 class ErrorLog extends Model
 {
     protected $guarded = [];
+
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'content' => 'json',
+    ];
 }

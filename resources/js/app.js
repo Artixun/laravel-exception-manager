@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import Base from './base';
 import axios from 'axios';
 import Routes from './routes';
 import VueRouter from 'vue-router';
@@ -20,6 +21,8 @@ const router = new VueRouter({
     mode: 'history',
     base: '/' + window.LaravelExceptionManager.path + '/',
 });
+
+Vue.mixin(Base);
 
 new Vue({
     el: '#exception',
