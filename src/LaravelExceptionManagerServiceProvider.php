@@ -64,7 +64,8 @@ class LaravelExceptionManagerServiceProvider extends ServiceProvider
     {
         return [
             'namespace' => 'Artixun\LaravelExceptionManager\Http\Controllers',
-            'prefix' => config('laravel-exception-manager.path')
+            'prefix' => config('laravel-exception-manager.path'),
+            'middleware' => 'web'
         ];
     }
 }

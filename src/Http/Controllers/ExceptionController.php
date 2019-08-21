@@ -34,4 +34,14 @@ class ExceptionController extends Controller
             'entries' => $entries
         ]);
     }
+
+    public function show($exceptionId)
+    {
+        $entry = ErrorLog::on(config('laravel-exception-manager.database_connection'))
+            ->findOrFail($exceptionId);
+
+        return response()->json([
+            'entry' => $entry
+        ]);
+    }
 }

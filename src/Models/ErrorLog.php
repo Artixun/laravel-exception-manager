@@ -20,6 +20,6 @@ class ErrorLog extends Model
      * @var array
      */
     protected $casts = [
-        'content' => 'json',
+        'content' => 'json'
     ];
 }

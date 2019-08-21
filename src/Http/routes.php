@@ -6,6 +6,7 @@
  * Time: 5:46 PM
  */
 
-Route::get('/{view?}', 'HomeController@index')->where('view', '(.*)')->name('exception-manager');
+Route::post('/exception-manager-api/exceptions', 'ExceptionController@index');
+Route::get('/exception-manager-api/exceptions/{exceptionId}', 'ExceptionController@show');
 
-Route::post('exceptions', 'ExceptionController@index');
+Route::get('/{view?}', 'HomeController@index')->where('view', '(.*)')->name('exception-manager');

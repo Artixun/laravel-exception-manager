@@ -76,6 +76,7 @@
 </template>
 
 <script>
+    import $ from 'jquery';
     import _ from 'lodash';
     import axios from 'axios';
 
@@ -118,6 +119,8 @@
                 this.checkForNewEntries();
                 this.ready = true;
             });
+
+            this.updateTimeAgo();
         },
 
         /**
@@ -125,11 +128,12 @@
          */
         destroyed() {
             clearTimeout(this.newEntriesTimeout);
+            clearTimeout(this.updateTimeAgoTimeout);
         },
 
         methods: {
             loadEntries(after){
-                axios.post('/' + LaravelExceptionManager.path + '/exceptions' +
+                axios.post('/' + LaravelExceptionManager.path + '/exception-manager-api/exceptions' +
                     '?before=' + this.lastEntryIndex +
                     '&take=' + this.entriesPerRequest
                 ).then(response => {
@@ -163,7 +167,7 @@
              */
             checkForNewEntries(){
                 this.newEntriesTimeout = setTimeout(() => {
-                    axios.post('/' + LaravelExceptionManager.path + '/exceptions' +
+                    axios.post('/' + LaravelExceptionManager.path + '/exception-manager-api/exceptions' +
                         '?take=1'
                     ).then(response => {
                         if (response.data.entries.length && !this.entries.length) {
@@ -200,6 +204,21 @@
                     this.checkForNewEntries();
                 });
             },
+
+            /**
+             * Update the timeago of each entry.
+             */
+            updateTimeAgo(){
+                this.updateTimeAgoTimeout = setTimeout(() => {
+
+                    _.each($('[data-timeago]'), time => {
+                        $(time).html(this.timeAgo($(time).data('timeago')));
+                    });
+
+                    this.updateTimeAgo();
+                }, 60000)
+            },
+
         }
     }
 </script>

@@ -20,6 +20,7 @@
     "vue-router": "^3.0.1",
     "laravel-mix": "^2.0",
     "moment": "^2.10.6",
-    "moment-timezone": "^0.5.21"
+    "moment-timezone": "^0.5.21",
+    "highlight.js": "^9.12.0"
   }
 }
